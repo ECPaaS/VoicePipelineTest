@@ -8,6 +8,9 @@ services:
       - /home/jack/ollama_models:/root/.ollama/models
     networks:
       - genai-network
+    environment:
+       OLLAMA_NUM_PARALLEL: 5
+       OLLAMA_KEEP_ALIVE: -1
     deploy:
       resources:
         reservations:

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-asr-deployment
+  labels:
+    app: tts-asr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-asr
+  template:
+    metadata:
+      labels:
+        app: tts-asr
+    spec:
+      containers:
+      - name: tts-asr
+        image: ecpaas-dockerhub.atan-networks.com.cn/test/tts-asr:latest
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-asr
+spec:
+  selector:
+    app: tts-asr
+  ports:
+  - name: http-tts-asr
+    protocol: TCP
+    port: 8000
+    targetPort: 8000
+    nodePort: 30028
+  type: NodePort

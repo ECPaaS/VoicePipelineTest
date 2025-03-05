@@ -1,0 +1,53 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: ollama
+  namespace: default
+  labels:
+    app: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+        - name: ollama
+          image: 'ollama/ollama:latest'
+          resources:
+            limits:
+              nvidia.com/gpu: 1
+          ports:
+            - name: http-11434
+              containerPort: 11434
+              protocol: TCP
+          env:
+            - name: OLLAMA_NUM_PARALLEL
+              value: "2"
+            - name: OLLAMA_KEEP_ALIVE
+              value: "-1"
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ollama
+  namespace: default
+  labels:
+    app: ollama
+spec:
+  ports:
+    - name: http-11434
+      protocol: TCP
+      port: 11434
+      targetPort: 11434
+      nodePort: 31434
+  selector:
+    app: ollama
+  type: NodePort
